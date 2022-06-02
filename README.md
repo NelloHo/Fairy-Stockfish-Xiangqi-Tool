@@ -1,5 +1,5 @@
 
-# Fairy_Stockfish Xiangqi Tool
+# Fairy-Stockfish Xiangqi Tool
 This is a tool for ianfab's Fairy-Stockfish, which help you input your moves in chinese traditional format in `xboard` mode.
 Currently, it only supports red side.
 
