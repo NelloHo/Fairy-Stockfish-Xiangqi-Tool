@@ -3,13 +3,13 @@ import subprocess
 
 global red, black ,chinesed_data , data, uci
 chinese_data = []
-data =[]
+
 
 uci_x = {1:'i',2:'h',3:'g',4:'f',5:'e',6:'d',7:'c',8:'b',9:'a'}
 x_uci={'i': 1, 'h': 2, 'g': 3, 'f': 4, 'e': 5, 'd': 6, 'c': 7, 'b': 8, 'a': 9}
 black_x_uci = {'i': 9, 'h': 8, 'g': 7, 'f': 6, 'e': 5, 'd': 4, 'c': 3, 'b': 2, 'a': 1}
 sf_location = 'C:\\Users\\user\\Desktop\\chess\\fairy-stockfish-largeboard_x86-64.exe'
-chinese_piece_name = {'k':'將', 'a':'士', 'e':'象', 'r':'車', 'h':'馬', 'c':'炮','p':'兵'}
+chinese_piece_name = {'k':'將', 'a':'士', 'e':'象', 'r':'車', 'h':'馬', 'c':'炮','p':'兵','+':'進','-':'退','=':'平'}
 
 with open("setting.json") as f:
 	load = json.loads(f.read())
@@ -54,7 +54,7 @@ def convert_to_uci(origin_position, position):
 	
 	output = [uci_x[origin_position[0]],origin_position[1]-1,uci_x[position[0]],position[1]-1]
 	output =''.join( [str(i) for i in output])
-	print(output)
+	
 	return output
 
 def convert_to_chinese(engine_move): #[[8,10],[7,8]]
@@ -62,7 +62,7 @@ def convert_to_chinese(engine_move): #[[8,10],[7,8]]
 	need_more_love = False
 	for piece, value in black.items():
 		for index ,position in enumerate(value):
-			print(position)
+			
 			if position == engine_move[0]: #[[8,8],[8,9]]
 				
 				if len(value) == 2 :
@@ -73,58 +73,61 @@ def convert_to_chinese(engine_move): #[[8,10],[7,8]]
 					if value[index][1] < value[1-index][1]: #前
 						if piece in 'eha':
 							if engine_move[0][1] - engine_move[1][1] > 0:
-								print('前{}進{}'.format(chinese_piece_name[piece], str(10-engine_move[1][0])))
+								show = '前{}進{}'.format(chinese_piece_name[piece], str(10-engine_move[1][0]))
+								
 							
 							elif engine_move[0][1] - engine_move[1][1] < 0:
-								print('前{}退{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0])))
+								show = '前{}退{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]))
 						
 						else:
 							if engine_move[0][1] - engine_move[1][1] > 0:
-								print('前{}進{}'.format(chinese_piece_name[piece], str(engine_move[0][1]-engine_move[1][1])))
+								show = '前{}進{}'.format(chinese_piece_name[piece], str(engine_move[0][1]-engine_move[1][1]))
 							
 							elif engine_move[0][1] - engine_move[1][1] == 0:
-								print('前{}平{}'.format(chinese_piece_name[piece], str(engine_move[1][0])))
+								show = '前{}平{}'.format(chinese_piece_name[piece], str(engine_move[1][0]))
 							
 							elif engine_move[0][1] - engine_move[1][1] < 0:
-								print('前{}退{}'.format(chinese_piece_name[piece], str(engine_move[1][1]-engine_move[0][1])))
+								show = '前{}退{}'.format(chinese_piece_name[piece], str(engine_move[1][1]-engine_move[0][1]))
 
 					else: #後
 						if piece in 'eha':
 							if engine_move[0][1] - engine_move[1][1] > 0:
-								print('後{}進{}'.format(chinese_piece_name[piece], str(10-engine_move[1][0])))
+								show = '後{}進{}'.format(chinese_piece_name[piece], str(10-engine_move[1][0]))
 							
 							elif engine_move[0][1] - engine_move[1][1] < 0:
-								print('後{}退{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0])))
+								show = '後{}退{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]))
 						
 						else:
 							if engine_move[0][1] - engine_move[1][1] > 0:
-								print('後{}進{}'.format(chinese_piece_name[piece], str(engine_move[0][1]-engine_move[1][1])))
+								show = '後{}進{}'.format(chinese_piece_name[piece], str(engine_move[0][1]-engine_move[1][1]))
 							
 							elif engine_move[0][1] - engine_move[1][1] == 0:
-								print('後{}平{}'.format(chinese_piece_name[piece], str(engine_move[1][0])))
+								show = '後{}平{}'.format(chinese_piece_name[piece], str(engine_move[1][0]))
 							
 							elif engine_move[0][1] - engine_move[1][1] < 0:
-								print('後{}退{}'.format(chinese_piece_name[piece], str(engine_move[1][1]-engine_move[0][1])))
+								show = '後{}退{}'.format(chinese_piece_name[piece], str(engine_move[1][1]-engine_move[0][1]))
 
 				
 				else:
 					if piece in 'eha':
 						if engine_move[0][1] - engine_move[1][1] > 0:
-							print('{}{}進{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(10-engine_move[1][0])))
+							show = '{}{}進{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(10-engine_move[1][0]))
 						
 						elif engine_move[0][1] - engine_move[1][1] < 0:
-							print('{}{}退{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(10-engine_move[1][0])))
+							show = '{}{}退{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(10-engine_move[1][0]))
 					
 					else:
 						if engine_move[0][1] - engine_move[1][1] > 0:
-							print('{}{}進{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(engine_move[0][1]-engine_move[1][1])))
+							show = '{}{}進{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(engine_move[0][1]-engine_move[1][1]))
 						
 						elif engine_move[0][1] - engine_move[1][1] == 0:
-							print('{}{}平{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(10-engine_move[1][0])))
+							show = '{}{}平{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(10-engine_move[1][0]))
 						
 						elif engine_move[0][1] - engine_move[1][1] < 0:
-							print('{}{}退{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(engine_move[1][1]-engine_move[0][1])))
-		
+							show = '{}{}退{}'.format(chinese_piece_name[piece], str(10-engine_move[0][0]), str(engine_move[1][1]-engine_move[0][1]))
+				print(show)
+				chinese_data.append(show)
+
 
 
 def Engine_response(uci_move):
@@ -134,9 +137,8 @@ def Engine_response(uci_move):
 	while True:
 		out = engine.stdout.readline()
 		
-		print(out)
+		
 		if out[0:4] == 'move':
-			print(convert_to_x(out[5:9]))
 			return convert_to_x(out[5:9])
 		elif out[0:5] == 'Error':
 			print('Error Move')
@@ -148,7 +150,7 @@ def check_eat_piece(moved_piece):
 	for piece,value in black.items():
 		for opposite_position in value:
 			if opposite_position == moved_piece:
-				print('remove',piece)
+				print('吃',chinese_piece_name[piece])
 				black[piece].remove(opposite_position)
 				break
 
@@ -156,7 +158,7 @@ def check_eat_piece_red(engine_move):
 	for piece,value in red.items():
 		for opposite_position in value:
 			if opposite_position == engine_move[1]:
-				print('remove',piece)
+				print('吃',chinese_piece_name[piece])
 				red[piece].remove(opposite_position)
 				break
 
@@ -166,7 +168,7 @@ def move_piece_black(engine_move):
 			if position == engine_move[0]:
 				black[piece].remove(engine_move[0])
 				black[piece].append(engine_move[1])
-				print(piece)
+				
 				
 
 
@@ -221,10 +223,9 @@ def move_piece(position,move): # position:[1,2] | move:['c',2,'=',5], ['h','+','
 		elif move[2] == "=":
 			position[0] = move[3]
 
-	chinese_data.append(move)
+	chinese_data.append(chinese_piece_name[move[0]]+str(move[1])+chinese_piece_name[move[2]]+str(move[3]))
 	uci_move = convert_to_uci(origin_position,position)
-	print(position)
-	print(uci_move)
+	
 	return uci_move
 
 
@@ -236,7 +237,20 @@ def print_position():
 		if output[0:3] == 'Key':
 			break
 
-
+def print_eval():
+	engine.stdin.write('eval\n')
+	while True:
+		output  = engine.stdout.readline()
+		if 'Final evaluation' in output:
+			index = []
+			for i in range(len(output)):
+				if output[i] in ['+','-','(']:
+					index.append(i)
+			print(output[index[0]:index[1]])
+			break
+def show_history_move():
+	for history_move in chinese_data:
+		print(history_move)
 
 
 def move_handler(position, move):
@@ -256,6 +270,10 @@ def start():
 	if inp == 'd':
 		print_position()
 
+	if inp == 'e':
+		print_eval()
+	if inp == 's':
+		show_history_move()
 
 	elif len(inp) == 4:
 		move = input_process(inp) #轉move成int串列
