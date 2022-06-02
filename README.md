@@ -27,3 +27,5 @@ ex:
 * 炮二平五 : c2=5
 * 馬八進七 : h8+7
 * 前車退二 : r+-2
+
+Fairy-Stockfish's move will present in traditional chinese notation, too.
