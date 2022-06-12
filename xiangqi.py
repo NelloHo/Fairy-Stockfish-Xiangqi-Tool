@@ -1,15 +1,17 @@
 import json
 import subprocess
+import matplotlib.pyplot as plt
 
 global red, black ,chinesed_data , data, uci
 chinese_data = []
-
+eval_data = []
 
 uci_x = {1:'i',2:'h',3:'g',4:'f',5:'e',6:'d',7:'c',8:'b',9:'a'}
 x_uci={'i': 1, 'h': 2, 'g': 3, 'f': 4, 'e': 5, 'd': 6, 'c': 7, 'b': 8, 'a': 9}
 black_x_uci = {'i': 9, 'h': 8, 'g': 7, 'f': 6, 'e': 5, 'd': 4, 'c': 3, 'b': 2, 'a': 1}
 sf_location = 'C:\\Users\\user\\Desktop\\chess\\fairy-stockfish-largeboard_x86-64.exe'
 chinese_piece_name = {'k':'將', 'a':'士', 'e':'象', 'r':'車', 'h':'馬', 'c':'炮','p':'兵','+':'進','-':'退','=':'平'}
+
 
 with open("setting.json") as f:
 	load = json.loads(f.read())
@@ -131,13 +133,13 @@ def convert_to_chinese(engine_move): #[[8,10],[7,8]]
 
 
 def Engine_response(uci_move):
+	
 	engine.stdin.write(uci_move+'\n')
+	eval()
 	engine.stdin.write('go\n')
 	
 	while True:
 		out = engine.stdout.readline()
-		
-		
 		if out[0:4] == 'move':
 			return convert_to_x(out[5:9])
 		elif out[0:5] == 'Error':
@@ -146,20 +148,12 @@ def Engine_response(uci_move):
 		
 
 #是否吃子
-def check_eat_piece(moved_piece):
-	for piece,value in black.items():
+def check_eat_piece(moved_piece,color):
+	for piece,value in color.items():
 		for opposite_position in value:
 			if opposite_position == moved_piece:
 				print('吃',chinese_piece_name[piece])
-				black[piece].remove(opposite_position)
-				break
-
-def check_eat_piece_red(engine_move):
-	for piece,value in red.items():
-		for opposite_position in value:
-			if opposite_position == engine_move[1]:
-				print('吃',chinese_piece_name[piece])
-				red[piece].remove(opposite_position)
+				color[piece].remove(opposite_position)
 				break
 
 def move_piece_black(engine_move):
@@ -237,7 +231,7 @@ def print_position():
 		if output[0:3] == 'Key':
 			break
 
-def print_eval():
+def eval():
 	engine.stdin.write('eval\n')
 	while True:
 		output  = engine.stdout.readline()
@@ -246,8 +240,13 @@ def print_eval():
 			for i in range(len(output)):
 				if output[i] in ['+','-','(']:
 					index.append(i)
-			print(output[index[0]:index[1]])
+			eval_data.append(output[index[0]:index[1]])
 			break
+		
+def show_eval_chart():
+	plt.bar(chinese_data,eval_data,width = 0.2)
+	plt.show()
+
 def show_history_move():
 	for history_move in chinese_data:
 		print(history_move)
@@ -255,12 +254,12 @@ def show_history_move():
 
 def move_handler(position, move):
 	uci_move = move_piece(position,move) # ↑
-	check_eat_piece(position)            #position已經動過了
+	check_eat_piece(position,black)            #position已經動過了
 	engine_move = Engine_response(uci_move)  #type(engine)=x
 	convert_to_chinese(engine_move)
 	move_piece_black(engine_move) #moved piece: 引擎動的棋子名稱
-	check_eat_piece_red(engine_move)
-	
+	check_eat_piece(engine_move[1],red)
+	eval()
 
 
 
@@ -271,9 +270,13 @@ def start():
 		print_position()
 
 	if inp == 'e':
-		print_eval()
-	if inp == 's':
+		print(eval_data[-2:])
+
+	if inp == 'h':
 		show_history_move()
+
+	if inp == 'c':#chart
+		show_eval_chart()
 
 	elif len(inp) == 4:
 		move = input_process(inp) #轉move成int串列
@@ -312,7 +315,7 @@ def start():
 engine = Engine(sf_location)
 engine.stdin.write('xboard\n')
 engine.stdin.write('variant xiangqi\n')
-engine.stdin.write('level 40 5 0\n')
+engine.stdin.write('st 3\n')
 
 while True:
 	start()
