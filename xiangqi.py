@@ -343,3 +343,7 @@ is_red = input('red or black , (r/b) ?') == 'r'
 
 if is_red:
 	start_red()
+
+
+
+	
