@@ -55,7 +55,7 @@ def convert_to_x(engine_move):
 def convert_to_uci(origin_position, position):
 	
 	output = [uci_x[origin_position[0]],origin_position[1]-1,uci_x[position[0]],position[1]-1]
-	output =''.join( [str(i) for i in output])
+	output =''.join([str(i) for i in output])
 	
 	return output
 
@@ -223,11 +223,24 @@ def move_piece(position,move): # position:[1,2] | move:['c',2,'=',5], ['h','+','
 	return uci_move
 
 
+
+def print_opposite_position():
+	engine.stdin.write('d\n')
+	output = []
+	while True:
+		engine_response = engine.stdout.readline()
+		output.append(engine_response)
+		if engine_response[0:3] == 'Key':
+			break
+	output.reverse()
+	for i in output:
+		print(i.rstrip())
+
 def print_position():
 	engine.stdin.write('d\n')
 	while True:
 		output = engine.stdout.readline()
-		print(output)
+		print(output.rstrip())
 		if output[0:3] == 'Key':
 			break
 
@@ -240,8 +253,11 @@ def eval():
 			for i in range(len(output)):
 				if output[i] in ['+','-','(']:
 					index.append(i)
-			eval_data.append(output[index[0]:index[1]])
-			break
+			try:
+				eval_data.append(output[index[0]:index[1]])
+			except:
+				pass
+			break 
 		
 def show_eval_chart():
 	plt.bar(chinese_data,eval_data,width = 0.2)
@@ -263,50 +279,54 @@ def move_handler(position, move):
 
 
 
-def start():
-	inp = input()
+def start_red():
+	while True:
+		inp = input()
 
-	if inp == 'd':
-		print_position()
+		if inp == 'd':
+			print_position()
 
-	if inp == 'e':
-		print(eval_data[-2:])
+		if inp == 'D':
+			print_opposite_position()
 
-	if inp == 'h':
-		show_history_move()
-
-	if inp == 'c':#chart
-		show_eval_chart()
-
-	elif len(inp) == 4:
-		move = input_process(inp) #轉move成int串列
+		if inp == 'e':
+			print(eval_data[-2:])
 		
-		if move[1] not in ['+','-']:
-			for i in range(len(red[move[0]])):
-				position = red[move[0]][i]
-				if position[0] == move[1]:
-					move_handler(position,move)
-					break	
-		
-		else:
-			if move[1]=='+':
-				bigger = [0,'']
+		if inp == 'h':
+			show_history_move()
+
+		if inp == 'c':#chart
+			show_eval_chart()
+
+		elif len(inp) == 4:
+			move = input_process(inp) #轉move成int串列
+			
+			if move[1] not in ['+','-']:
 				for i in range(len(red[move[0]])):
 					position = red[move[0]][i]
-					if position[1] > bigger[0]:
-						bigger[0]=position[1]
-						bigger[1]=position
-				move_handler(bigger[1],move)
+					if position[0] == move[1]:
+						move_handler(position,move)
+						break	
+			
+			else:
+				if move[1]=='+':
+					bigger = [0,'']
+					for i in range(len(red[move[0]])):
+						position = red[move[0]][i]
+						if position[1] > bigger[0]:
+							bigger[0]=position[1]
+							bigger[1]=position
+					move_handler(bigger[1],move)
 
 
-			elif move[1]=='-':
-				smaller = [11,'']
-				for i in range(len(red[move[0]])):
-					position = red[move[0]][i]
-					if position[1] < smaller[0]:
-						smaller[0]=position[1]
-						smaller[1]=position
-				move_handler(smaller[1],move)
+				elif move[1]=='-':
+					smaller = [11,'']
+					for i in range(len(red[move[0]])):
+						position = red[move[0]][i]
+						if position[1] < smaller[0]:
+							smaller[0]=position[1]
+							smaller[1]=position
+					move_handler(smaller[1],move)
 
 	
 
@@ -317,5 +337,9 @@ engine.stdin.write('xboard\n')
 engine.stdin.write('variant xiangqi\n')
 engine.stdin.write('st 3\n')
 
-while True:
-	start()
+
+is_red = input('red or black , (r/b) ?') == 'r'
+
+
+if is_red:
+	start_red()
